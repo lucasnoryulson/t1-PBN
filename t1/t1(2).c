@@ -50,25 +50,32 @@ void raioX(int linhas, int colunas, struct Pixel matriz[linhas][colunas]){
     }
 }
 
-void rotacionar(int linhas, int colunas, struct Pixel matriz[linhas][colunas]){
-    // Transposição da matriz (trocar linhas por colunas)
+void rotacionar(int linhas, int colunas, struct Pixel matriz[linhas][colunas]) {
+    // Aloca memória para a matriz temporária rotacionada
+    struct Pixel** tempMatriz = malloc(colunas * sizeof(struct Pixel*));
+    for (int i = 0; i < colunas; i++) {
+        tempMatriz[i] = malloc(linhas * sizeof(struct Pixel));
+    }
+
+    // Preenche a matriz temporária com os valores rotacionados
     for (int i = 0; i < linhas; i++) {
-        for (int j = i + 1; j < colunas; j++) {
-            struct Pixel temp = matriz[i][j];
-            matriz[i][j] = matriz[j][i];
-            matriz[j][i] = temp;
+        for (int j = 0; j < colunas; j++) {
+            tempMatriz[j][linhas - 1 - i] = matriz[i][j];
         }
     }
 
-    // Inverter a ordem das colunas (para rotacionar 90 graus)
-    for (int i = 0; i < linhas; i++) {
-        for (int j = 0; j < colunas / 2; j++) {
-            struct Pixel temp = matriz[i][j];
-            matriz[i][j] = matriz[i][colunas - j - 1];
-            matriz[i][colunas - j - 1] = temp;
+    // Copia os valores da matriz temporária de volta para a matriz original
+    for (int i = 0; i < colunas; i++) {
+        for (int j = 0; j < linhas; j++) {
+            matriz[j][i] = tempMatriz[i][j];
         }
     }
 
+    // Libera a memória alocada para a matriz temporária
+    for (int i = 0; i < colunas; i++) {
+        free(tempMatriz[i]);
+         }
+    free(tempMatriz);
 }
 
 
@@ -77,8 +84,26 @@ int main() {
     char tipoImg[3];
     int i, j, linhas, colunas, valor, r, g, b;
 
+
+   
+    char imagem[100];
+   printf("Digite o nome da imagem que deseja editar: \n");
+   scanf("%s", imagem);
+
+    if (strcmp(imagem, "sp.ppm") == 0){
+        strcpy(imagem, "/home/lucas/Área de Trabalho/PUCRS/PBN/t1/sp.ppm");
+    }
+    if (strcmp(imagem, "rj.ppm") == 0){
+        strcpy(imagem, "/home/lucas/Área de Trabalho/PUCRS/PBN/t1/rj.ppm");
+    }
+    if (strcmp(imagem, "portoalegre.ppm") == 0){
+        strcpy(imagem, "/home/lucas/Área de Trabalho/PUCRS/PBN/t1/portoalegre.ppm");
+    }
+    
+    
     // Abre o arquivo
-    fp = fopen("/home/lucas/Área de Trabalho/PUCRS/PBN/t1/Yuri-Alberto-desencanta-com-chegada-de-Antonio-Oliveira.ppm", "r");
+   
+    fp = fopen(imagem, "r");
     if (fp == NULL) {
         printf("Erro ao abrir o arquivo de entrada.\n");
         return 1;
@@ -129,7 +154,7 @@ int main() {
 
     // Interação com o usuário para escolha de opções
     int escolha;
-    printf("Escolha uma das seguintes opções: ");
+    printf("Escolha uma das seguintes opções: \n1-cinza\n2-negativo\n3-raioX\n4-rotacionar\n");
     scanf("%d", &escolha);
 
     if(escolha == 1){
@@ -149,7 +174,7 @@ int main() {
     }
 
     // Criação do novo arquivo PPM
-    FILE* fp_novo = fopen("/home/lucas/Área de Trabalho/PUCRS/PBN/t1/Yuri-Alberto-desencanta-com-chegada-de-Antonio-Oliveira.ppm", "w");
+    FILE* fp_novo = fopen("/home/lucas/Área de Trabalho/PUCRS/PBN/t1/resultado.ppm", "w");
     if (fp_novo == NULL) {
         printf("Erro ao criar o arquivo.\n");
         free(matriz);
